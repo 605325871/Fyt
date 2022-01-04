@@ -1,38 +1,49 @@
-# include "strbuf.h"
-
-void test()
+# include <stdio.h>
+# include <stdlib.h>
+# include <assert.h>
+# include <string.h>
+typedef struct strbuf
 {
-	stb *sb=NULL;
-	StrBuf_Init(&sb, 10);
-	StrBuf_attach(&sb, "xi", 2, 10);
-	StrBuf_attach(&sb, "you", 3, 10);
-	StrBuf_attach(&sb, "linux", 5, 10);
+    int len;
+    int alloc;//容量
+    char* buf;
+    struct strbuf* next;
 
-	StrBuf_attach(&sb, "niu", 3, 10);
+}stb;
+//初始化 √
+void  StrBuf_Init(stb**sb, int alloc);
+// 填充字符 √
+void StrBuf_attach(stb* sb, void* str, int len, int alloc);
+//释放内存 √
+void StrBuf_Relese(stb* sb);
+// 交换两个strbuf
+void StrBuf_Swap(stb* sb, stb* bs);
+//获取长度
+char* StrBuf_Detach(stb* sb, int sz);
+// 比较两个strbuf是否相同
+int  StrBuf_cmp(const stb* first, const stb* second);
+// 清空sb
+void StrBuf_reset(stb* sb);
+//打印内容 长度 与 容量
+void StrBuf_print(stb* sb);
+// 申请新的sb
+stb* BuyNode(int alloc);
 
-	StrBuf_attach(&sb, "bi", 2, 10);
-	StrBuf_print(&sb);
-	
-	stb* p1 = StrBuf_Find(sb, "xi");
-	stb* p2 = StrBuf_Find(sb, "you");
-
-	if (StrBuf_cmp(p1, p2) == 0)
-	{
-		printf("一样");
-	}
-	else
-	{
-		printf("不一样");
-	}
-	
-
-	StrBuf_Relese(&sb);
-}
+stb* StrBuf_Find(stb** sb, char* x);
 
 
 
-int main()
-{
-	test();
-		
-}
+
+
+
+// 检查长度
+int StrBuf_strlen(stb* sb);
+// 扩大长度
+void StrBuf_Grow(stb* sb, int extra);
+// 追加  数据
+void StrBuf_add(stb* sb, const void* data, int len);
+// 追加单个字符
+void StrBuf_addch(stb* sb, char c);
+// 追加字符串
+void StrBuf_addstr(stb* sb, char* s);
+//追加一个sb到另一个sb
