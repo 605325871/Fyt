@@ -1,49 +1,62 @@
+
+# define _CRT_SECURE_NO_WARNINGS 1
 # include <stdio.h>
 # include <stdlib.h>
 # include <assert.h>
 # include <string.h>
+
+ # define lengh 256
+
 typedef struct strbuf
 {
     int len;
-    int alloc;//å®¹é‡
-    char* buf;
+    int alloc;//ÈİÁ¿
+    char buf[lengh];
     struct strbuf* next;
 
 }stb;
-//åˆå§‹åŒ– âˆš
+//³õÊ¼»¯ ¡Ì
 void  StrBuf_Init(stb**sb, int alloc);
-// å¡«å……å­—ç¬¦ âˆš
+stb* stf_new(int alloc);
+// Ìî³ä×Ö·û ¡Ì
 void StrBuf_attach(stb* sb, void* str, int len, int alloc);
-//é‡Šæ”¾å†…å­˜ âˆš
+//ÊÍ·ÅÄÚ´æ ¡Ì
 void StrBuf_Relese(stb* sb);
-// äº¤æ¢ä¸¤ä¸ªstrbuf
+// ½»»»Á½¸östrbuf
 void StrBuf_Swap(stb* sb, stb* bs);
-//è·å–é•¿åº¦
+//»ñÈ¡³¤¶È
 char* StrBuf_Detach(stb* sb, int sz);
-// æ¯”è¾ƒä¸¤ä¸ªstrbufæ˜¯å¦ç›¸åŒ
+// ±È½ÏÁ½¸östrbufÊÇ·ñÏàÍ¬
 int  StrBuf_cmp(const stb* first, const stb* second);
-// æ¸…ç©ºsb
+// Çå¿Õsb
 void StrBuf_reset(stb* sb);
-//æ‰“å°å†…å®¹ é•¿åº¦ ä¸ å®¹é‡
+//´òÓ¡ÄÚÈİ ³¤¶È Óë ÈİÁ¿
 void StrBuf_print(stb* sb);
-// ç”³è¯·æ–°çš„sb
-stb* BuyNode(int alloc);
+//²éÕÒº¯Êı
+stb* StrBuf_Find(stb* sb, char* x);
 
-stb* StrBuf_Find(stb** sb, char* x);
-
-
-
+//½«»º´æÇøµÄÄÚÈİ±£´æ
+void str_tocharattay(stb* sb, char* poubuf);
 
 
 
-// æ£€æŸ¥é•¿åº¦
+
+// ¼ì²é³¤¶È
 int StrBuf_strlen(stb* sb);
-// æ‰©å¤§é•¿åº¦
+// À©´ó³¤¶È
 void StrBuf_Grow(stb* sb, int extra);
-// è¿½åŠ   æ•°æ®
+// ×·¼Ó  Êı¾İ
 void StrBuf_add(stb* sb, const void* data, int len);
-// è¿½åŠ å•ä¸ªå­—ç¬¦
+// ×·¼Óµ¥¸ö×Ö·û
 void StrBuf_addch(stb* sb, char c);
-// è¿½åŠ å­—ç¬¦ä¸²
+// ×·¼Ó×Ö·û´®
 void StrBuf_addstr(stb* sb, char* s);
-//è¿½åŠ ä¸€ä¸ªsbåˆ°å¦ä¸€ä¸ªsb
+//×·¼ÓÒ»¸ösbµ½ÁíÒ»¸ösb
+void str_addbuf(stb* sb, const stb* sb2);
+
+
+//È¥³ısb×ó¶ËµÄËùÓĞ¿Õ¸ñ tab¡®\t¡¯
+void strbuf_rtrim(stb* sb);
+// È¥µôÓÒ¶ËµÄ 
+void strbuf_ltrim(stb* sb);
+//  É¾³ıµô»º³åÇø´ÓÖ¸¶¨Î»ÖÃµÄ×Ö·û
