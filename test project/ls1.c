@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+//
 #define LS_NONE 0
 #define LS_L 101
 #define LS_R 102
@@ -17,6 +18,12 @@
  
 #define LS_AL (LS_A+LS_L)
 #define LS_AI (LS_A+LS_I)
+int analyzeParam(char* input);//分析命令行参数
+char* uid_to_name(uid_t uid); //通过passwd结构体获得username
+char* gid_to_name(gid_t gid);//通过group结构体获得组名
+void putcolor(char *filename,int stmode);// 着色 
+void show_file_info(char* filename, struct stat* info_p);
+void do_ls(char dirname[],int mode);
 
 int analyzeParam(char* input){
     if(strlen(input)==2)
@@ -107,17 +114,53 @@ char* gid_to_name(gid_t gid)
     printf(" %-8s", gid_to_name(info_p->st_gid));
     printf(" %8ld", (long) info_p->st_size);
     printf(" %.12s", 4 + ctime(&info_p->st_mtime));
-    printf(" %s\n", filename);
+   // printf(" %s\n", filename);
+   putcolor(filename,info_p->st_mode);
+    printf("\n");
+}
+
+#define S_ISEXEC(m) (((m)&(0000111))!=(0))//检测是否为可执行文件
+void putcolor(char *filename,int stmode)
+{
+     if(S_ISDIR(stmode))
+        printf("\033[01;34m%-10s\033[0m", filename);
+    else if(S_ISLNK(stmode))
+        printf("\033[01;36m%-10s\033[0m", filename);
+	else if(S_ISFIFO(stmode))
+		printf("\033[40;33m%-10s\033[0m", filename);
+	else if(S_ISSOCK(stmode))
+		printf("\033[01;35m%-10s\033[0m", filename);
+	else if(S_ISBLK(stmode))
+		printf("\033[40;33;01m%-10s\033[0m", filename);
+	else if(S_ISCHR(stmode))
+		printf("\033[40;33;01m%-10s\033[0m", filename);
+	else if(S_ISREG(stmode))
+    {
+		if(S_ISEXEC(stmode))
+        {
+			printf("\033[01;32m%-10s\033[0m", filename);
+		}
+		else
+        {
+			printf("%-10s", filename);
+		}
+	}
+	else
+    {
+		printf("%-10s", filename);
+	}
+
 }
 
 void do_ls(char dirname[],int mode)
 {
     DIR* dir_ptr;
     struct dirent* direntp;
- 
+        struct stat* info_p;
     if ((dir_ptr = opendir(dirname)) == NULL)
     {
         fprintf(stderr, "ls2: cannot open %s \n", dirname);
+        
     }
     else
     {
@@ -158,13 +201,14 @@ void do_ls(char dirname[],int mode)
                         {
                             printf("%ld ", direntp->d_ino);
                         }
- 
-                        printf("%-5s", direntp->d_name);
+                       //   printf("%-5s", direntp->d_name);
+                        putcolor(direntp->d_name,info.st_mode);
                     }
                     else if(mode == LS_R)
                     {
-
-                        if(S_ISDIR(info.st_mode))
+    
+                        
+                      if(S_ISDIR(info.st_mode))
                         {
                             printf("%s\n", direntp->d_name);
  
@@ -175,12 +219,13 @@ void do_ls(char dirname[],int mode)
                         {
                             printf("%s\n", direntp->d_name);
                         }
+                        
                     }
  
                 }
             }
  
-            if(mode == LS_R)
+           if(mode == LS_R)
             {
                 int i=0;
                 printf("\n");
@@ -188,11 +233,13 @@ void do_ls(char dirname[],int mode)
                     printf("%s:\n", dirs[i]);
                     do_ls(dirs[i],LS_R);
                 }
+                
             }
    printf("\n");
         closedir(dir_ptr);
     }
 }
+
 
 int main(int ac,char* av[])
 {
