@@ -1,2 +1,3 @@
 # Fyt
-hello world
+The new journey begins here
+hope persist
