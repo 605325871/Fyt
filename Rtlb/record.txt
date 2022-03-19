@@ -1,0 +1,6 @@
+record the learning process
+
+3.19 
+学习了c++的多态与继承 因为计划原因，暂定明天学习stl库
+坚持阅读linux系统环境编程
+完成算法题1道
