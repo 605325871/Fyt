@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -7,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+# include <stdlib.h>
 //
 #define LS_NONE 0
 #define LS_L 101
@@ -152,11 +154,17 @@ void putcolor(char *filename,int stmode)
 
 }
 
+
+# define maxlen 3000
+
 void do_ls(char dirname[],int mode)
 {
     DIR* dir_ptr;
     struct dirent* direntp;
         struct stat* info_p;
+        int dir_count = 0;
+
+
     if ((dir_ptr = opendir(dirname)) == NULL)
     {
         fprintf(stderr, "ls2: cannot open %s \n", dirname);
@@ -166,9 +174,17 @@ void do_ls(char dirname[],int mode)
     {
         
         
-            char dirs[256][256];
-            int dir_count = 0;
-            
+            //char dirs[256][256];
+
+      char **dirs=(char**)malloc(sizeof(char*)*maxlen);  
+        memset(dirs, 0, sizeof(char *) * maxlen);                                               
+    for(int i=0;i<maxlen;i++)                                               
+    {                                                                       
+        dirs[i]=(char*)malloc(sizeof(char)*maxlen);
+    }
+
+
+
             while ((direntp = readdir(dir_ptr)) != NULL)
             {
  
@@ -177,10 +193,13 @@ void do_ls(char dirname[],int mode)
                     continue;
                 }
  
-                char complete_d_name[256];  // 文件的完整路径
+                //char complete_d_name[256];  // 文件的完整路径
+                char *complete_d_name=(char*)malloc(sizeof(char)*maxlen);
+                memset(complete_d_name,0,sizeof(complete_d_name));
                 strcpy (complete_d_name,dirname);
                 strcat (complete_d_name,"/");
                 strcat (complete_d_name,direntp->d_name);
+
                 struct stat info;
                 if (lstat(complete_d_name, &info) == -1)
                 {
@@ -220,6 +239,7 @@ void do_ls(char dirname[],int mode)
                     }
  
                 }
+                    free(complete_d_name);
             }
  
            if(mode == LS_R)
@@ -232,6 +252,11 @@ void do_ls(char dirname[],int mode)
                 
             }
    printf("\n");
+     for (int i = 0; i < maxlen; i++)
+    {
+        free(dirs[i]);
+    }
+    free(dirs);
         closedir(dir_ptr);
     }
 }
