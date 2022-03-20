@@ -166,7 +166,7 @@ void do_ls(char dirname[],int mode)
     {
         
         
-            char dirs[4096][100];
+            char dirs[256][256];
             int dir_count = 0;
             
             while ((direntp = readdir(dir_ptr)) != NULL)
@@ -177,15 +177,12 @@ void do_ls(char dirname[],int mode)
                     continue;
                 }
  
-                char complete_d_name[4000];  // 文件的完整路径
-                if(dirname[2]!='s' && dirname[2]!='b'&&dirname[2]!='d')
-                {
+                char complete_d_name[256];  // 文件的完整路径
                 strcpy (complete_d_name,dirname);
                 strcat (complete_d_name,"/");
                 strcat (complete_d_name,direntp->d_name);
-                }
                 struct stat info;
-                if (stat(complete_d_name, &info) == -1)
+                if (lstat(complete_d_name, &info) == -1)
                 {
                     perror(complete_d_name);
                 }
@@ -228,7 +225,6 @@ void do_ls(char dirname[],int mode)
            if(mode == LS_R)
             {
                 int i=0;
-                printf("\n");
                 for(;i<dir_count;i++){
                     printf("%s:\n", dirs[i]);
                     do_ls(dirs[i],LS_R);
