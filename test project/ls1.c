@@ -226,14 +226,15 @@ void do_ls(char dirname[],int mode)
                         
                       if(S_ISDIR(info.st_mode))
                         {
-                            printf("%s\n", direntp->d_name);
- 
+                          //  printf("%s\n", direntp->d_name);
+                           putcolor(direntp->d_name,info.st_mode);
                             strcpy (dirs[dir_count],complete_d_name);
                             dir_count++;
                         }
                         else
                         {
-                            printf("%s\n", direntp->d_name);
+                            putcolor(direntp->d_name,info.st_mode);
+                           // printf("%s\n", direntp->d_name);
                         }
                         
                     }
