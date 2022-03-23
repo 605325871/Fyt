@@ -15,9 +15,10 @@
 #define LS_R 102
 #define LS_D 103
 #define LS_I 104
- 
+#define ls_s 105
+int _s=0;
 #define LS_A 200
- 
+#define ls_sl (ls_s+LS_L)
 #define LS_AL (LS_A+LS_L)
 #define LS_AI (LS_A+LS_I)
 int analyzeParam(char* input);//分析命令行参数
@@ -35,11 +36,16 @@ int analyzeParam(char* input){
         if(input[1]=='d') return LS_D;
         if(input[1]=='R') return LS_R;
         if(input[1]=='i') return LS_I;
+        if(input[1]=='s')   _s=1; return ls_s;
     }
     else if(strlen(input)==3)
     {
         if(input[1]=='a'&& input[2]=='l') return LS_AL;
+         if(input[1]=='l'&& input[2]=='a') return LS_AL;
         if(input[1]=='a'&& input[2]=='i') return LS_AI;
+         if(input[1]=='i'&& input[2]=='a') return LS_AI;
+         if(input[1]=='s'&& input[2]=='l') _s=1; return ls_sl;
+          if(input[1]=='l'&& input[2]=='s') _s=1; return ls_sl;
     }
     return -1;
 }
@@ -84,6 +90,14 @@ char* gid_to_name(gid_t gid)
    
     char modestr[11];
     strcpy(modestr, "----------");
+     if(_s==1)
+          {                       
+             long long size=info_p->st_size/1024;                              
+               if(size<=4)           
+                  printf("4   ");                
+               else         
+                  printf("%-4lld",size);                                                                                                                                                    
+           }                     
  
     if (S_ISDIR(info_p->st_mode))
         modestr[0] = 'd';
@@ -155,7 +169,7 @@ void putcolor(char *filename,int stmode)
 }
 
 
-# define maxlen 3000
+# define maxlen 8000
 
 void do_ls(char dirname[],int mode)
 {
@@ -183,8 +197,6 @@ void do_ls(char dirname[],int mode)
         dirs[i]=(char*)malloc(sizeof(char)*maxlen);
     }
 
-
-
             while ((direntp = readdir(dir_ptr)) != NULL)
             {
  
@@ -192,10 +204,8 @@ void do_ls(char dirname[],int mode)
                 {
                     continue;
                 }
- 
-                //char complete_d_name[256];  // 文件的完整路径
-                char *complete_d_name=(char*)malloc(sizeof(char)*maxlen);
-                memset(complete_d_name,0,sizeof(complete_d_name));
+                
+                char complete_d_name[PATH_MAX];  // 文件的完整路径
                 strcpy (complete_d_name,dirname);
                 strcat (complete_d_name,"/");
                 strcat (complete_d_name,direntp->d_name);
@@ -207,22 +217,33 @@ void do_ls(char dirname[],int mode)
                 }
                 else
                 {
-                    if(mode == LS_L||mode == LS_AL)
+                    if(mode == LS_L||mode == LS_AL||mode==ls_sl)
                     {
                         show_file_info(direntp->d_name, &info);
+                        
                     }
-                    else if(mode == LS_A||mode == LS_NONE||mode == LS_I||mode == LS_AI)
+                    else if(mode == LS_A||mode == LS_NONE||mode == LS_I||mode == LS_AI||mode == ls_s)
                     {
                         if(mode == LS_I||mode == LS_AI)
-                        {
+                        {                                
                             printf("%ld ", direntp->d_ino);
                         }
-                       //   printf("%-5s", direntp->d_name);
+                         //   printf("%-5s", direntp->d_name);
+                            if(_s==1)
+                             {  
+                                                 
+                            long long size=info.st_size/1024;                              
+                            if(size<=4)           
+                            printf("4  ");                
+                            else             
+                                printf("%-4lld",size);                                                                                                                                                    
+                            }     
                         putcolor(direntp->d_name,info.st_mode);
                     }
                     else if(mode == LS_R)
                     {
-    
+                          if(strcmp(direntp->d_name,".")==0||strcmp(direntp->d_name,"..")==0)             
+                          continue;
                         
                       if(S_ISDIR(info.st_mode))
                         {
@@ -240,13 +261,13 @@ void do_ls(char dirname[],int mode)
                     }
  
                 }
-                    free(complete_d_name);
             }
  
            if(mode == LS_R)
             {
                 int i=0;
                 for(;i<dir_count;i++){
+
                     printf("%s:\n", dirs[i]);
                     do_ls(dirs[i],LS_R);
                 }
