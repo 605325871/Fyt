@@ -7,11 +7,16 @@
 #define right 30000200
 
 #define thtnum (right - left +1)
+struct thr_arg_st
+{
+    int n;
+};
 
 void *thr_prime(void *p)
 {
     int i;
-    i = (int*)p;
+    i = ((struct thr_arg_st*)p)->n; //括号
+    free(p);
     for( i=left;i<=right;i++)
     {
        int mark=1;
@@ -34,10 +39,19 @@ int main()
     int i,j,k;
     int err;
     pthread_t tid[thtnum];
+    struct thr_arg_st *p;
+
     //main 线程 进行创建线程
     for(i=left ; i<=right ;i++)
     {
-        err =pthread_create(tid + (i - left),NULL,thr_prime,(void*)i);
+        p = malloc(sizeof(*p));
+        if(p==NULL)
+        {
+            perror("malloc");
+            exit(-1);
+        }
+        p->n=i;
+        err =pthread_create(tid + (i - left),NULL,thr_prime,p);
         if(err)
         {
             fprintf(stderr,"pthread_creat():%s\n",strerror(err));
