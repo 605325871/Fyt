@@ -16,7 +16,6 @@ void *thr_prime(void *p)
 {
     int i;
     i = ((struct thr_arg_st*)p)->n; //括号
-    free(p);
     for( i=left;i<=right;i++)
     {
        int mark=1;
@@ -31,7 +30,7 @@ void *thr_prime(void *p)
        if(mark)
         printf("%d is a primer\n",i);
     }
-   pthread_exit(NULL);
+   pthread_exit(p);
 }
 
 int main()
@@ -39,6 +38,7 @@ int main()
     int i,j,k;
     int err;
     pthread_t tid[thtnum];
+    void *ptr;
     struct thr_arg_st *p;
 
     //main 线程 进行创建线程
@@ -63,7 +63,8 @@ int main()
     //为线程收尸
     for(i =left ; i<=right ;i++)
     {
-        pthread_join(tid[i -left],NULL);
+        pthread_join(tid[i -left],&ptr);
+        free(ptr);
     }
 
     exit(0);
