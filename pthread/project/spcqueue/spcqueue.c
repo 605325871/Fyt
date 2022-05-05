@@ -28,7 +28,7 @@ void SPSCQueuePush(SPSCQueue *queue, void *s)
 {   
     queue->num=(int)s;
     queue->next=NULL;
-    printf("%ld线程生产%d号产品:%d\n", pthread_self(),i++, queue->num);
+    printf("%ld线程生产产品:%d\n", pthread_self(), queue->num);
     if(head->next == NULL)
     {
         head->next=queue;
@@ -50,7 +50,7 @@ void *SPSCQueuePop(SPSCQueue *queue)
    
     if(head->next->next==NULL)
     {
-        printf(" %ld线程消费%d产品:%d\n", pthread_self(),i--, head->next->next->num);
+        printf(" %ld线程消费产品:%d\n", pthread_self(), head->next->next->num);
          head->count--;
         free(head->next->next);
         head->next->next=NULL;
@@ -58,7 +58,7 @@ void *SPSCQueuePop(SPSCQueue *queue)
     else
     {
         struct SPSCQueue *next1=head->next->next;
-        printf(" %ld线程消费%d产品:%d\n", pthread_self(),i--, head->next->num);
+        printf(" %ld线程消费产品:%d\n", pthread_self(), head->next->num);
          head->count--;
         free(head->next);
         head->next=NULL;
@@ -76,9 +76,9 @@ void SPSCQueueDestory(SPSCQueue *queue)
 }
 void* producer(void * b)
 {
-    struct SPSCQueue* sq;
     while(1)
     {
+         struct SPSCQueue* sq;
         sq =SPSCQueueInit(1);
         if(sq==NULL)
         {
@@ -134,4 +134,6 @@ int main()
 
     pthread_join(pid,NULL);
     pthread_join(cid,NULL);
+    pthread_mutex_destroy(&mut);
+    exit(0);
 }
