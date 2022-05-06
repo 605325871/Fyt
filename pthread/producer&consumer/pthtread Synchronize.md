@@ -1,6 +1,6 @@
 # 线程同步的几种方式
 
-#互斥锁
+# 互斥锁
 >使用互斥量完成对临界区的资源的加锁操作，使得同一时刻，对一个共享数据的使用只能又一个线程完成
 
 例向屏幕上一次打印abcd四个字母
@@ -135,10 +135,9 @@ int main()
 # 信号量
 介绍以下信号量是进化版的互斥量，允许多个线程访问共享资源与条件变量和互斥量类此的操作，在进程和线程中均可以使用
 
-       int sem_init(sem_t *sem, int pshared, unsigned int value);
-       int sem_destroy(sem_t *sem);
-
-       Link with -pthread.
+    int sem_init(sem_t *sem, int pshared, unsigned int value);
+    int sem_destroy(sem_t *sem);
+    Link with -pthread.
 >
 * sem为定义的信号量，传出型参数
 * pshared
@@ -150,6 +149,135 @@ int main()
     int sem_wait(sem_t *sem);
     int sem_trywait(sem_t *sem);
     int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
-
 ```
-申请信号量，申请成功value--，当value为0
+申请信号量，申请成功value--，当value为0 则阻塞
+
+```c
+ int sem_post(sem_t *sem);
+```
+释放信号量value++
+
+例 信号量实现生产者消费者模型
+```c
+sem_t pro_sem,con_sem;
+#define semcnt 5
+int i=0;
+int queue[semcnt];
+int beginnum = 100;
+void *thr_produce(void*arg)
+{
+    while(1)
+    {
+        sem_wait(&pro_sem);//生产者申请资源 pro_sem每被占用一次--一次 当为0时则阻塞
+        printf("%ld 线程生产了 %d\n",pthread_self(),beginnum);
+        queue[(i++)%semcnt]= beginnum++;
+        sem_post(&con_sem);//为消费者的信号量释放资源pro_sem每被释放一次++一次
+        sleep(rand()%4);
+    }
+    return NULL;
+}
+void* thr_con(void* arg)
+{   
+    int i=0;
+    int num=0;
+    while(1)
+    {
+        sem_wait(&con_sem);
+        num = queue[(i++)%semcnt];
+        printf("%ld 线程消费了 %d\n",pthread_self(),num);
+        sem_post(&pro_sem);
+        sleep(rand()%3);
+    }
+    return NULL;
+}
+int main()
+{
+    sem_init(&pro_sem,0,semcnt);
+    sem_init(&con_sem,0,0); //消费者初始默认没有产品
+    pthread_t tid[2];
+     int err1=pthread_create(&tid[0],NULL,thr_produce,NULL);
+     if(err1)
+        {
+            fprintf(stderr,"pthread_creat():%s\n",strerror(err1));
+            exit(1);
+        }
+    int err2=pthread_create(&tid[1],NULL,thr_con,NULL);
+      if(err2)
+        {
+            fprintf(stderr,"pthread_creat():%s\n",strerror(err1));
+            exit(1);
+        }
+        pthread_join(tid[0],NULL);
+        pthread_join(tid[1],NULL);
+
+    sem_destroy(&pro_sem);
+    sem_destroy(&con_sem);
+
+}
+````
+
+# 读写锁
+ * 读写锁 与互斥量类似，但是读写锁允许更高的并行性，其特性为：**写独占，读共享**
+
+ **读写锁实质上是一把锁，有不同的状态，写锁的优先级高**
+ * 读写锁的三种状态
+     * 读模式下加锁（读锁）
+     * 写模式下加锁（写锁）
+     * 不加锁状态
+* 读写锁的特性： 读锁可以共享读的状态，当读锁加上时，阻塞写锁的加锁
+即使读锁加上时  后面的 写锁依然会被阻塞，当前面读锁释放时才能加成功
+```c
+pthread_rwlock_t rwlock =PTHREAD_RWLOCK_INITIALIZER;
+int beginum=100;
+void*thr_Wr(void*arg)
+{
+    while(1)
+    {
+        pthread_rwlock_wrlock(&rwlock);
+        printf("-写线程--beginum = %d\n",beginum++);
+        usleep(2000);//模拟占用时间
+        pthread_rwlock_unlock(&rwlock);
+        usleep(2000);//简单防止再抢锁的方法但不建议使用
+    }
+    return NULL;
+}
+void*thr_ead(void*arg)
+{
+    while (1)
+    {
+        pthread_rwlock_rdlock(&rwlock);
+      printf("-读读线程--beginum = %d\n",beginum);
+        usleep(2000);//模拟占用时间
+       pthread_rwlock_unlock(&rwlock);
+        usleep(2000);//简单防止再抢锁的方法但不建议使用
+
+    }
+    
+    return NULL;
+}
+int main()
+{
+    int n=8,i=0;
+    pthread_t tid[8];
+
+
+    for(i = 0; i<5;i++)
+    {
+        pthread_create(&tid[i],NULL,thr_ead,NULL);
+    }
+     for(; i<8;i++)
+    {
+        pthread_create(&tid[i],NULL,thr_Wr,NULL);
+    }
+     for(i = 0; i<8;i++)
+    {
+        pthread_join(tid[i],NULL);
+    }
+
+   pthread_rwlock_destroy(&rwlock);
+}
+```
+
+
+
+
