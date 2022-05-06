@@ -5,7 +5,7 @@
 #include <stdlib.h>
 // Single-producer , single-consumer Queue
 int i=0;
-struct SPSCQueue *head;
+struct SPSCQueue *head,*tail;
 static pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t  cond = PTHREAD_COND_INITIALIZER;
 
@@ -26,9 +26,10 @@ SPSCQueue *SPSCQueueInit(int capacity)
 }
 void SPSCQueuePush(SPSCQueue *queue, void *s)
 {   
+
     queue->num=(int)s;
     queue->next=NULL;
-    printf("%ld线程生产产品:%d\n", pthread_self(), queue->num);
+    printf("%ld线程生产:%d\n", pthread_self(), queue->num);
     if(head->next == NULL)
     {
         head->next=queue;
@@ -48,21 +49,22 @@ void SPSCQueuePush(SPSCQueue *queue, void *s)
 void *SPSCQueuePop(SPSCQueue *queue)
 {  
    
-    if(head->next->next==NULL)
+    if(head->next==NULL)
     {
-        printf(" %ld线程消费产品:%d\n", pthread_self(), head->next->next->num);
+        printf(" %ld线程消费:%d\n", pthread_self(), head->next->next->num);
          head->count--;
-        free(head->next->next);
+        free(head->next);
         head->next->next=NULL;
     }
     else
     {
         struct SPSCQueue *next1=head->next->next;
-        printf(" %ld线程消费产品:%d\n", pthread_self(), head->next->num);
+         printf(" %ld线程消费:%d\n", pthread_self(), head->next->num);
          head->count--;
         free(head->next);
         head->next=NULL;
         head->next=next1;
+
         
     }
 
@@ -76,6 +78,7 @@ void SPSCQueueDestory(SPSCQueue *queue)
 }
 void* producer(void * b)
 {
+
     while(1)
     {
          struct SPSCQueue* sq;
@@ -87,18 +90,18 @@ void* producer(void * b)
         }
         // 加锁
        pthread_mutex_lock(&mut);
-
        while (head->count==head->capacity)
-           pthread_cond_wait(&cond,&mut);
-        
+       {
+        pthread_cond_wait(&cond,&mut);
+       }
         //生产
-        SPSCQueuePush(sq, rand() % 1000 + 1) ;
+        SPSCQueuePush(sq, (void*)rand()) ;
         //解锁
        pthread_mutex_unlock(&mut);
         //通知
        pthread_cond_signal(&cond);
     }
-    
+    return NULL;
 }
 void* consumer(void * a)
 {
@@ -108,23 +111,24 @@ void* consumer(void * a)
         //解锁
          while(head->next==NULL)
             pthread_cond_wait(&cond,&mut);
-            
         SPSCQueuePop(head);
         pthread_mutex_unlock(&mut); 
         pthread_cond_signal(&cond);
-        sleep(1);
     }
 }
 int main()
 {
     pthread_t cid,pid;
     head=SPSCQueueInit(10);
+
     int err1=pthread_create(&pid,NULL,producer,NULL);
      if(err1)
         {
             fprintf(stderr,"pthread_creat():%s\n",strerror(err1));
             exit(1);
         }
+
+
     int err2=pthread_create(&cid,NULL,consumer,NULL);
       if(err2)
         {
@@ -135,5 +139,6 @@ int main()
     pthread_join(pid,NULL);
     pthread_join(cid,NULL);
     pthread_mutex_destroy(&mut);
+    SPSCQueueDestory(head);
     exit(0);
 }
