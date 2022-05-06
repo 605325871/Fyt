@@ -21,9 +21,9 @@ static void* pthreadfunc(void* p)
 
     while(1)
     {
-    pthread_mutex_lock(&mut);
-    while(num!=n)
-            pthread_cond_wait(&cond,&mut);
+    pthread_mutex_lock(&mut); // 加锁
+    while(num!=n) 
+            pthread_cond_wait(&cond,&mut); //当num不为自己所处理de的值时
 
     write(1,&c,1);
     num = next(num);
