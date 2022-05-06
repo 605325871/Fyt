@@ -12,6 +12,9 @@ typedef struct _prodinfo
     struct _prodinfo *next;
 }prod;
 struct _prodinfo* head=NULL;
+/*  条件变量可以引起阻塞并非锁
+
+*/
 void *thr_produce(void*arg)
 {
     while(1)
@@ -25,7 +28,7 @@ void *thr_produce(void*arg)
         head=pd;
         printf(" -%ld号线程生产%d产品\n",pthread_self(),pd->num);
         pthread_mutex_unlock(&mut);
-        pthread_cond_signal(&cond);
+        pthread_cond_signal(&cond);  
         sleep(rand()%4);
     }
 }
