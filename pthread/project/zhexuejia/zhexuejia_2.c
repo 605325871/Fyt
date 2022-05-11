@@ -20,18 +20,18 @@ void* phlos(void*arg)
         if(0 == i%2)
         {
         printf("哲学家正在思考\n");
-        sleep(rand()%4);
+        // sleep(rand()%4);
         printf("哲学家%d号emo了准备吃\n",i);
 
         pthread_mutex_lock(&mut);
         sem_wait(&chopsticks[left]); //拿起筷子
         printf("哲学家%d拿起了%d号筷子,现在只有一根筷子\n",i,left);
-        sem_wait(&chopsticks[right]);
+        // sem_wait(&chopsticks[right]);
         printf("哲学家%d拿起了%d号筷子\n",i,right);
         pthread_mutex_unlock(&mut);
 
         printf("哲学家%d现在拿了两根筷子开始吃\n",i);
-        sleep(rand()%4);
+        // sleep(rand()%4);
         sem_post(&chopsticks[left]);
         printf("哲学家%d放下了%d号筷子\n",i,left);//归还筷子
         sem_post(&chopsticks[right]);
@@ -40,7 +40,7 @@ void* phlos(void*arg)
         else
         {
         printf("哲学家正在思考\n");
-        sleep(rand()%4);
+        // sleep(rand()%4);
         printf("哲学家emo了准备吃\n");
 
         pthread_mutex_lock(&mut);
@@ -51,7 +51,7 @@ void* phlos(void*arg)
         pthread_mutex_unlock(&mut);
 
         printf("哲学家%d现在拿了两根筷子开始吃\n",i);
-        sleep(rand()%4);
+        // sleep(rand()%4);
         sem_post(&chopsticks[left]);
         printf("哲学家%d放下了%d号筷子\n",i,left);//归还筷子
         sem_post(&chopsticks[right]);
