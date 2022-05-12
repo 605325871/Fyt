@@ -26,7 +26,7 @@ void* phlos(void*arg)
         pthread_mutex_lock(&mut);
         sem_wait(&chopsticks[left]); //拿起筷子
         printf("哲学家%d拿起了%d号筷子,现在只有一根筷子\n",i,left);
-        // sem_wait(&chopsticks[right]);
+         sem_wait(&chopsticks[right]);
         printf("哲学家%d拿起了%d号筷子\n",i,right);
         pthread_mutex_unlock(&mut);
 
