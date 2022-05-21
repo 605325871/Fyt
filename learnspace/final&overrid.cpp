@@ -17,6 +17,7 @@ public:
     {
         cout<<"this is test 2"<<endl;
     }
+
 };
 
 class child :public base
