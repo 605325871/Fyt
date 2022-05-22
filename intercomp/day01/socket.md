@@ -1,5 +1,4 @@
 
-
 #  convert values between host and networkbyte order
  ```cpp
  #include <arpa/inet.h>
@@ -33,6 +32,7 @@ const char *inet_ntop(int af, const void *src,
 
 
 
+sock就是一个创建一个操作网络io接口
 # socket
 ```c
 int socket(int domain, int type, int protocol);

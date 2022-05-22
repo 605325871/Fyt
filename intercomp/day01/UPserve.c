@@ -40,16 +40,18 @@ int main()
     bid = bind(lfd, (struct sockaddr *)&serve_addr, sizeof(serve_addr)); //将端口号与ip地址与套接字绑定
     if (bid == -1)
         myerr("bind");
-    if (listen(lfd, 128) == -1)
+
+    if (listen(lfd, 128) == -1)  //监听连接上限
         myerr("listen");
 
-    cfd = accept(lfd, (struct sockaddr *)&clit_addr, &clit_addr_len);
+    cfd = accept(lfd, (struct sockaddr *)&clit_addr, &clit_addr_len);//阻塞等等待客户端连接，成功的话返回一个与客户端成功连接的socket文件
     if (cfd == -1)
         myerr("accept");
 
     printf("client ip : %s  , port :  %d",
            inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_ip_, sizeof(client_ip_)),
            ntohs(clit_addr.sin_port));
+           
     while (1)
     {
         ret = read(cfd, buff, sizeof(buff));
