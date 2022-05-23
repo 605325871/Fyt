@@ -48,12 +48,13 @@ int main()
     if (cfd == -1)
         myerr("accept");
 
-    printf("client ip : %s  , port :  %d",
-           inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_ip_, sizeof(client_ip_)),
-           ntohs(clit_addr.sin_port));
+    
            
     while (1)
     {
+          printf("client ip : %s  , port :  %d",
+           inet_ntop(AF_INET, &clit_addr.sin_addr.s_addr, client_ip_, sizeof(client_ip_)),
+           ntohs(clit_addr.sin_port));
         ret = read(cfd, buff, sizeof(buff));
         write(STDOUT_FILENO, buff, ret);
         for (int i = 0; i < ret; i++)
