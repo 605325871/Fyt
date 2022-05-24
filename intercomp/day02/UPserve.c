@@ -1,48 +1,95 @@
 #include <stdio.h>
-#include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <ctype.h>
-#include <unistd.h>
 #include <arpa/inet.h>
-/*
-    int connect(int sockfd, const struct sockaddr *addr,
-                   socklen_t addrlen);
+#include <ctype.h>
 
-*/
-#define SERV_PORT 9527
-void myerr(const char *str)
+int main(int argc, const char *argv[])
 {
-    perror(str);
-    exit(1);
-}
-
-int main()
-{
-    int cfd, ret;
-    int conter = 10;
-    char buff[BUFSIZ];
-    struct sockaddr_in clint_addr;
-    socklen_t clint_len = sizeof(clint_addr);
-
-    cfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (cfd == -1)
-        myerr("socket error");
-    clint_addr.sin_family = AF_INET;
-    clint_addr.sin_port = htons(SERV_PORT);
-
-    inet_pton(AF_INET, "127.0.0.1", &clint_addr.sin_addr.s_addr);
-    if (connect(cfd, (struct sockaddr *)&clint_addr, clint_len) == -1)
-        myerr("connect error");
-    while (conter--)
+    // 创建用于监听的套节字
+    int lfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (lfd == -1)
     {
-        write(cfd, "hello", 5);
-        ret = read(cfd, buff, sizeof(buff));
-        write(STDOUT_FILENO, buff, ret);
-        sleep(1);
+        perror("socket error");
+        exit(1);
     }
+
+    // 绑定
+    struct sockaddr_in serv_addr;
+    // init
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    // bzero(&serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;                // 地址族协议  ipv4
+    serv_addr.sin_port = htons(9527);              // 本地端口， 需要转换为大端
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); // 0 是用本机的任意IP
+
+    int ret = bind(lfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if (ret == -1)
+    {
+        perror("bind error");
+        exit(1);
+    }
+
+    // 设置监听
+    ret = listen(lfd, 64);
+    if (ret == -1)
+    {
+        perror("listen error");
+        exit(1);
+    }
+
+    // 等待并接受连接请求
+    struct sockaddr_in cline_addr;
+    socklen_t clien_len = sizeof(cline_addr);
+    int cfd = accept(lfd, (struct sockaddr *)&cline_addr, &clien_len);
+    if (cfd == -1)
+    {
+        perror("accept error");
+        exit(1);
+    }
+
+    char ipbuf[64];
+    // int -> char*
+    printf("cliient ip: %s, port: %d\n",
+           inet_ntop(AF_INET, &cline_addr.sin_addr.s_addr, ipbuf, sizeof(ipbuf)),
+           ntohs(cline_addr.sin_port));
+
+    // 通信
+    while (1)
+    {
+        // 先接收数据
+        char buf[1024] = {0};
+        int len = read(cfd, buf, sizeof(buf));
+        if (len == -1)
+        {
+            perror("read error");
+            break;
+        }
+        else if (len > 0)
+        {
+            // 小写 -》 大写
+            for (int i = 0; i < len; ++i)
+            {
+                buf[i] = toupper(buf[i]);
+            }
+            // 数据发送给客户端
+
+            write(cfd, buf, strlen(buf) + 1);
+            write(STDOUT_FILENO, buf, len);
+        }
+        else if (len == 0)
+        {
+            printf("client disconnect ...\n");
+            break;
+        }
+    }
+
+    close(lfd);
     close(cfd);
+
     return 0;
 }
