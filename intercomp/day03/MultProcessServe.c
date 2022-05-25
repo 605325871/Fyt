@@ -18,7 +18,8 @@ void perr_exit(const char *s)
 
 void catch_child(int signum)
 {
-    while (waitpid(0, NULL, WNOHANG) > 0) ;
+    while (waitpid(0, NULL, WNOHANG) > 0)
+        ;
     return;
 }
 int main()
@@ -32,13 +33,17 @@ int main()
 
     struct sockaddr_in serv_addr, client;
     memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET; //为serveaddr 结构体设置ipv4协议
-    serv_addr.sin_port = htons(SERV_PORT);//将端口号 从本地小端 转换成大端
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//在本机中找出空闲的地址
+    serv_addr.sin_family = AF_INET;                //为serveaddr 结构体设置ipv4协议
+    serv_addr.sin_port = htons(SERV_PORT);         //将端口号 从本地小端 转换成大端
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); //在本机中找出空闲的地址
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0); // 利用listenfd 来操纵socket结构体的缓冲区
     if (listenfd == -1)
         perr_exit("socket error");
+
+    int pot = 1; //设置端口复用
+    if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, (void *)&pot, sizeof(pot)) == -1)
+        perr_exit("setsockopt error\n");
 
     if (bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) // 将缓冲区与地址结构进行绑定
         perr_exit("bind error");
@@ -77,7 +82,7 @@ int main()
         }
         else if (pid > 0)
         {
-            struct sigaction act;       //父进程等待回收子进程
+            struct sigaction act; //父进程等待回收子进程
             act.sa_handler = catch_child;
             sigemptyset(&act.sa_mask);
             act.sa_flags = 0;
