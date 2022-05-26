@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <ctype.h>
+#include<errno.h>
 
 int main(int argc, const char *argv[])
 {
