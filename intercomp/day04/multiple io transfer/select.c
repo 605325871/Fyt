@@ -14,7 +14,7 @@
 void perr_exit(const char *s)
 {
     perror(s);
-    exit(1);
+       exit(1);
 }
 int main()
 {
@@ -59,7 +59,7 @@ int main()
                 perr_exit("accept error");
             char ip[64];
             printf("new client IP: %s, Port: %d\n",
-                   inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, ip, sizeof(ip)),
+                   inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip)),
                    ntohs(client_addr.sin_port));
             FD_SET(cfd, &redset);
             maxfd = cfd > maxfd ? cfd : maxfd;
