@@ -61,7 +61,8 @@ int main()
             FD_SET(cfd, &readset);
             maxfd = cfd > maxfd ? cfd : maxfd;
         }
-
+        if (-1 == --cnt)
+            continue;
         for (int j = lfd + 1; j <= maxfd; j++)
         {
             if (FD_ISSET(j, &temp))
