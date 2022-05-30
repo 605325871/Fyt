@@ -11,6 +11,7 @@
 #include <sys/epoll.h>
 int main(int argc, const char *argv[])
 {
+     char buf[1];
     // 创建用于监听的套节字
     int lfd = socket(AF_INET, SOCK_STREAM, 0);
     if (lfd == -1)
@@ -77,8 +78,7 @@ int main(int argc, const char *argv[])
             }
             else
             {
-                char buf[3];
-                int len = read(fd, buf, sizeof(buf));
+                int len = read(fd, buf, 1);
                 if (len == -1)
                 {
                     perror("read error");
@@ -88,9 +88,9 @@ int main(int argc, const char *argv[])
                 {
                     for (int i = 0; i < len; ++i)
                         buf[i] = toupper(buf[i]);
-
+                    printf("%s",buf);
                     write(fd, buf, strlen(buf) + 1);
-                    write(STDOUT_FILENO, buf, len);
+                
                 }
                 else if (len == 0)
                 {
