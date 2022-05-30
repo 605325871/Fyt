@@ -112,7 +112,6 @@ int main()
                 {
                     perr_exit("read error");
                 }
-                if()
             }
         }
     }
