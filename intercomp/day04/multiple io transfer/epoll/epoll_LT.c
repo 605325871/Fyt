@@ -27,8 +27,6 @@ int main(int argc, const char *argv[])
     serv_addr.sin_family = AF_INET;                // 地址族协议  ipv4
     serv_addr.sin_port = htons(9527);              // 本地端口， 需要转换为大端
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); // 0 是用本机的任意IP
-    int opt;
-    setsockopt(lfd,)
     int ret = bind(lfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (ret == -1)
     {
@@ -79,7 +77,7 @@ int main(int argc, const char *argv[])
             }
             else
             {
-                char buf[3] = {0};
+                char buf[3];
                 int len = read(fd, buf, sizeof(buf));
                 if (len == -1)
                 {

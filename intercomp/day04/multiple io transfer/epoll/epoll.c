@@ -69,14 +69,14 @@ int main(int argc, const char *argv[])
         for (int i = 0; i < num; i++)
         {
             int fd = evs[i].data.fd;
-            if (fd == lfd)
+            if (fd == lfd) //有新的客户端发起连接请求
             {
                 int cfd = accept(fd, NULL, NULL);
                 ev.events = EPOLLIN;
                 ev.data.fd = cfd;
                 epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev);
             }
-            else
+            else  //写事件
             {
                 char buf[1024] = {0};
                 int len = read(fd, buf, sizeof(buf));
@@ -98,7 +98,7 @@ int main(int argc, const char *argv[])
                 {
                     printf("client disconnect ...\n");
 
-                 poll_ctl(epfd, EPOLL_CTL_DEL, lfd, &ev); //先删除再关闭
+                    poll_ctl(epfd, EPOLL_CTL_DEL, lfd, &ev); //先删除再关闭
                     close(fd);
                 }
             }
