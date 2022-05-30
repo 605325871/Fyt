@@ -23,7 +23,7 @@ public:
     int getliveNum(); //查看存活的线程数量
 
 private:
-    void *worker(void *arg);
-    void *manger(void *arg);
+    static void *worker(void *arg);
+    static void *manger(void *arg);
     void threadexit();
 };

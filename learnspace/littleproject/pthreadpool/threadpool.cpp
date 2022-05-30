@@ -34,7 +34,7 @@ threadpool::threadpool(int min, int max)
 
         this->shutdown = false;
 
-        pthread_create(&managerid, NULL, manager, NULL);
+        pthread_create(&managerid, NULL, manger, this);
 
         for (int i = 0; i < min; i++)
         {
@@ -47,4 +47,11 @@ threadpool::threadpool(int min, int max)
         delete[] threadid;
     if (Taskq)
         delete Taskq;
+}
+
+void *threadpool::worker(void *arg)
+{
+}
+void *threadpool:: manger(void *arg)
+{
 }
