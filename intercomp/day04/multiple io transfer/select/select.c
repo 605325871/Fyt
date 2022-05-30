@@ -47,22 +47,19 @@ int main()
 
     while (1)
     {
-        tmp = redset;
-        int cnt = select(maxfd + 1, &tmp, NULL, NULL, NULL);
+        tmp = redset; //创建副本
+        int cnt = select(maxfd + 1, &tmp, NULL, NULL, NULL);//表示需要监听的文件描述符的最大值 + 1，其实本质是一个线性表为了监听到最后一个文件描述符所以+1；
         if (cnt < 0)
             perr_exit("select error");
 
-        if (FD_ISSET(lfd, &tmp)) //判断是不是监听的lfd
+        if (FD_ISSET(lfd, &tmp)) //判断是不是监听的lfd，是不是有新的客户端发起连接
         {
-            cfd = accept(lfd, (struct sockaddr *)&client_addr, &client_len); //监听客户端
+            cfd = accept(lfd, (struct sockaddr *)&client_addr, &client_len); //监听客户端，和发起请求的客户端建立连接
             if (cfd == -1)
                 perr_exit("accept error");
-            char ip[64];
-            printf("new client IP: %s, Port: %d\n",
-                   inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip)),
-                   ntohs(client_addr.sin_port));
-            FD_SET(cfd, &redset);
-            maxfd = cfd > maxfd ? cfd : maxfd;
+    
+            FD_SET(cfd, &redset);//加入到原始的数组中
+            maxfd = cfd > maxfd ? cfd : maxfd;//判断 maxfd是不是当前最大上限
         }
 
         for (int j = lfd + 1; j <= maxfd; ++j)    ////// j从lfd下一个开始即可
