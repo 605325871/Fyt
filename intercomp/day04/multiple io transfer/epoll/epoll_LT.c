@@ -9,9 +9,11 @@
 #include <ctype.h>
 #include <errno.h>
 #include <sys/epoll.h>
+#include<fcntl.h>
 int main(int argc, const char *argv[])
 {
-     char buf[1];
+     char buf[4];
+     int flags;
     // 创建用于监听的套节字
     int lfd = socket(AF_INET, SOCK_STREAM, 0);
     if (lfd == -1)
@@ -53,8 +55,10 @@ int main(int argc, const char *argv[])
     // /int epoll_ctl(int __epfd, int __op, int __fd, struct epoll_event *)
 
     struct epoll_event ev;
-    ev.events = EPOLLIN;
+
+    ev.events = EPOLLIN |EPOLLET;//设置为et模式必须使用非阻塞io
     ev.data.fd = lfd;
+
     struct epoll_event evs[1024];
     int size = sizeof(evs) / sizeof(evs[0]);
 
@@ -72,13 +76,18 @@ int main(int argc, const char *argv[])
             if (fd == lfd)
             {
                 int cfd = accept(fd, NULL, NULL);
+
+                // flags=fcntl(cfd,F_GETFL);    //将文件设置为非阻塞模式
+                // flags |=O_NONBLOCK;
+                // fcntl(cfd,F_SETFL,flags);
+
                 ev.events = EPOLLIN;
                 ev.data.fd = cfd;
                 epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev);
             }
             else
             {
-                int len = read(fd, buf, 1);
+                int len = read(fd, buf, sizeof(buf));
                 if (len == -1)
                 {
                     perror("read error");
@@ -86,8 +95,8 @@ int main(int argc, const char *argv[])
                 }
                 else if (len > 0)
                 {
-                    for (int i = 0; i < len; ++i)
-                        buf[i] = toupper(buf[i]);
+                    // for (int i = 0; i < len; ++i)
+                    //     buf[i] = toupper(buf[i]);
                     printf("%s",buf);
                     write(fd, buf, strlen(buf) + 1);
                 
