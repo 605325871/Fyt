@@ -1,9 +1,11 @@
 #pragma once
 #include "TaskQueue.h"
+#include"taskqueue.cpp"
+template<class T>
 class threadpool
 {
 private:
-    TaskQueue *Taskq;
+    TaskQueue<T> *Taskq;
     pthread_t managerid;      //管理者线程id
     pthread_t *threadid;      //工作的线程id
     int minNum;               //最小线程数量
@@ -14,11 +16,12 @@ private:
     pthread_mutex_t mutepool; //锁整个线程池
     pthread_cond_t notempty;  // 任务队列是不是空了
     bool shutdown;            //是不是要销毁，1是销毁，0不销毁
+    static const int NUMBRE = 2;
 
 public:
     threadpool(int min, int max);
     ~threadpool();
-    void addtask(task task);
+    void addTask(task<T> task);
     int getBusyNum(); // 查看工作中的线程数量
     int getliveNum(); //查看存活的线程数量
 
