@@ -245,7 +245,6 @@ void recvdata(int client_fd, int event, void *arg)
 {
     int len;
     struct my_events *ev = (struct my_events *)arg;
-
     len = recv(client_fd, ev->m_buf, sizeof(ev->m_buf), 0);
     // 1.将ev对应的文件描述符和结构体从红黑树拿下
     eventdel(ep_fd, ev);
