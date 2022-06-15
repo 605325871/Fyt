@@ -30,9 +30,5 @@ void strblob::pop_back()
 int main()
 {
     auto p =make_shared<int>(42);
-
-   if ( p.unique())
-   {
-       cout<<"yes"<<endl;
-   }
+    
 }
