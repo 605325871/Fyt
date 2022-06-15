@@ -49,10 +49,10 @@ public:
             _ret = recvfrom(_socketfd, buff, sizeof(buff), 0, (struct sockaddr *)&_client_addr, &_client_len);
             if (_ret > 0)
             {
-                printf("read buff = %s ,数量为%d\n",buff,_ret);
+                printf("read buff = %s ,数量为%ld\n",buff,_ret);
                 for(int i=0;i<_ret;++i)
                     buff[i]=toupper(buff[i]);
-                sendto(_socketfd,buff,_ret,0,(struct sockaddr* ))
+                sendto(_socketfd,buff,_ret,0,(struct sockaddr* )&_client_addr,sizeof(_client_addr));
             }
         }
     }
@@ -62,3 +62,11 @@ public:
         exit(-1);
     }
 };
+
+int main()
+{
+    upserve us;
+    us.udpservintt();
+    us.upserstat();
+
+}
