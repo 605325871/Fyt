@@ -24,6 +24,33 @@ public:
         strcpy(str, tmp.str);
         cout << "拷贝构造函数调用" << endl;
     }
+
+    //移动拷贝构造函数调用
+    mystring(mystring &&t)
+    {
+        str = t.str; //拷贝地址，没有重新申请内存
+        len = t.len;
+
+        t.str = NULL; //原来的指针指空
+        cout << "移动拷贝构造" << endl;
+    }
+    //移动赋值函数调用
+    mystring &operator=(mystring &&tmp)
+    {
+        if (&tmp == this)
+        {
+            return *this;
+        }
+
+        len = 0;
+        delete[] str;
+
+        len = tmp.len;
+        str = tmp.str;
+        tmp.str = nullptr;
+
+        return *this;
+    }
     mystring &operator=(const mystring &tmp)
     {
         if (&tmp == this)
