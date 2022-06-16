@@ -7,6 +7,9 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 /*
     int connect(int sockfd, const struct sockaddr *addr,
                    socklen_t addrlen);
@@ -36,12 +39,14 @@ int main()
     inet_pton(AF_INET, "127.0.0.1", &clint_addr.sin_addr.s_addr);
     if (connect(cfd, (struct sockaddr *)&clint_addr, clint_len) == -1)
         myerr("connect error");
-    while (conter--)
+    int fd1 = open("1.txt",O_RDONLY);
+    int legth=0; 
+    char tmp[100];
+    while ((legth = read(fd1,tmp,sizeof(tmp)))>0)
     {
-        write(cfd, "hello", 5);
-        ret = read(cfd, buff, sizeof(buff));
-        write(STDOUT_FILENO, buff, ret);
-        sleep(1);
+        write(cfd, tmp, legth);
+        
+        usleep(300);
     }
     close(cfd);
     return 0;
