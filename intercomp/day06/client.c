@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <arpa/inet.h>
+tcp sticky packet
 /*
     int connect(int sockfd, const struct sockaddr *addr,
                    socklen_t addrlen);
