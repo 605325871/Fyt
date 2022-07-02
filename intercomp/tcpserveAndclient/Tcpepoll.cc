@@ -101,6 +101,7 @@ std::string Tcpepoll::recvMsg(int _fd)
 {
     // 先读包头
     int len = 0;
+    int x=0;
     readn((char *)&len, 4,_fd);
     len = ntohl(len);
 
@@ -149,6 +150,7 @@ void Tcpepoll::acceptConn()
                 else if (len == -1)
                 {
                     perr_exit("recvmsg error");
+                    
                 }
             }
         }
