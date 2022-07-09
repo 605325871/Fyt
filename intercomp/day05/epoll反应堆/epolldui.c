@@ -14,7 +14,7 @@
 
 struct my_events
 {
-    void *m_arg;                                     //泛型参数，难点
+    void *m_arg;                                     //泛型参数，
     int m_event;                                     //监听的事件
     int m_fd;                                        //监听的文件描述符
     void (*call_back)(int fd, int event, void *arg); //回调函数
