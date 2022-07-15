@@ -16,6 +16,7 @@ public:
     }
 };
 
+
 int main()
 {
     thread t1(ThreadFunc, 10); ///线程函数为函数指针
