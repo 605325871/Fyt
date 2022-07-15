@@ -14,7 +14,7 @@
 #include "TcpSocket.hh"
 #define SERV_PORT 9527
 class TcpServer
-{
+{   
 public:
     TcpServer();
     ~TcpServer();
