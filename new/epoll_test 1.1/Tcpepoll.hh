@@ -16,21 +16,6 @@
 #include <sys/signal.h>
 #include <list>
 #include <memory>
-struct myevent
-{
-    int m_event_status; //监听的事件
-    int m_fd;           //监听的文件描述符
-
-    void *arg;
-    int len;
-    myevent() = default;
-    myevent(int _md) : m_fd(_md)
-    {
-        m_event_status = -1;
-        len = 0;
-    }
-};
-
 class Tcpepoll
 {
 private:
@@ -41,8 +26,6 @@ private:
     int evssize;
     int serv_port{9527};
     std::list<int> clients_list;
-    // std::unique_ptr<std::string> messg;
-    std::string newmessg;
 public:
     Tcpepoll(/* args */);
     ~Tcpepoll();
