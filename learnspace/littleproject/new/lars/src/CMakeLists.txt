@@ -3,5 +3,5 @@ aux_source_directory(. SRC_LIST)
 include_directories(../include)
 
 add_executable(main ${SRC_LIST})
-TARGET_LINK_LIBRARIES(main pthread)
+TARGET_LINK_LIBRARIES(main hiredis)
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)

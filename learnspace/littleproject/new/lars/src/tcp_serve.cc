@@ -6,7 +6,14 @@ inline void tcp_server::perr_exit(const char *s)
     perror(s);
     exit(-1);
 }
-tcp_server::tcp_server(const char *ip, uint16_t port)
+
+void accept_callback(event_loop *loop, int fd, void *args)
+{
+    tcp_server *server = (tcp_server *)args;
+    server->do_accept();
+}
+
+tcp_server::tcp_server(event_loop *loop, const char *ip, uint16_t port)
 {
     //忽略SIGEPIP,SIGEHUB
     if (signal(SIGHUP, SIG_IGN) == SIG_ERR)
@@ -33,6 +40,12 @@ tcp_server::tcp_server(const char *ip, uint16_t port)
 
     if ((listen(_socketfd, 128)) < 0)
         perr_exit("listen error");
+
+    //将loop加入到
+    _loop = loop;
+
+    //注册_socketfd事件
+    _loop->add_epoll_event(_socketfd, accept_callback, EPOLLIN, this);
 }
 tcp_server::~tcp_server()
 {

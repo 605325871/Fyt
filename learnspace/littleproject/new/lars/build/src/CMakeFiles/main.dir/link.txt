@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/main.dir/SerMain.cc.o CMakeFiles/main.dir/buff_pool.cc.o CMakeFiles/main.dir/io_buf.cc.o CMakeFiles/main.dir/reator_bufer.cc.o CMakeFiles/main.dir/tcp_serve.cc.o -o ../../bin/main  -lpthread 

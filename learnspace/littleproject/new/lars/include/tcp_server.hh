@@ -8,6 +8,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include "event_loop.hh"
 class tcp_server
 {
 private:
@@ -16,9 +17,11 @@ private:
     socklen_t _addrlen;
     inline void perr_exit(const char *s);
 
+    // epoll 多路io复用
+    event_loop *_loop;
+
 public:
-    tcp_server(const char *ip, uint16_t port);
+    tcp_server(event_loop *loop, const char *ip, uint16_t port);
     ~tcp_server();
     void do_accept();
 };
-

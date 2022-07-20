@@ -1,5 +1,0 @@
-/home/fyt/learning/learnspace/littleproject/new/lars/build/CMakeFiles/edit_cache.dir
-/home/fyt/learning/learnspace/littleproject/new/lars/build/CMakeFiles/rebuild_cache.dir
-/home/fyt/learning/learnspace/littleproject/new/lars/build/src/CMakeFiles/main.dir
-/home/fyt/learning/learnspace/littleproject/new/lars/build/src/CMakeFiles/edit_cache.dir
-/home/fyt/learning/learnspace/littleproject/new/lars/build/src/CMakeFiles/rebuild_cache.dir
