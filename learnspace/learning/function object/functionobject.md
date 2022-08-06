@@ -18,7 +18,7 @@ public:
 void test01()
 {
     myadd myadd;
-    cout<<myadd(10,10)<<endl;
+    cout<<myadd(10,10)<<endl
 }
 ```
 * 函数对象可以拥有自己的状态
