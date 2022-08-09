@@ -13,6 +13,7 @@ void strblob::check(size_type i, const string &msg) const
 string &strblob::front()
 {
     check(0, "back on empty strblob");
+    
     return data->front();
 }
 
