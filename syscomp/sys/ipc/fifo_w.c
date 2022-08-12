@@ -24,7 +24,6 @@ int main(int argc ,char ** argv)
         memset(buf,0x00,sizeof(buf));
         sprintf(buf,"xiaoming%04d\n",num++);
         write(fd,buf,sizeof(buf));
-        sleep(1);
     }
      close(fd);
         return 0;
