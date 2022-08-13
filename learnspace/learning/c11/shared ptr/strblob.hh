@@ -14,7 +14,7 @@ public:
     strblob();
     strblob(std::initializer_list<std::string> i1);
     size_type size() const { return data->empty(); }
-    //添加和删除元素
+    
     void push_back(const std::string &t) { data->push_back(t); }
     void pop_back();
     //元素访问
