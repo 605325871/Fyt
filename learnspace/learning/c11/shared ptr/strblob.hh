@@ -20,6 +20,7 @@ public:
     //元素访问
     std::string &front();
     std::string &back();
+    
     ~strblob() {}
 };
 
