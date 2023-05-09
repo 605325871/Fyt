@@ -1,10 +1,55 @@
 package main
 
 import (
-	"fmt"
-	"math/rand"
-	"time"
+	"github.com/tetratelabs/proxy-wasm-go-sdk/proxywasm"
+	"github.com/tetratelabs/proxy-wasm-go-sdk/proxywasm/types"
+
+	"github.com/alibaba/higress/plugins/wasm-go/pkg/wrapper"
 )
+
+func main() {
+	wrapper.SetCtx(
+		"hello-world",
+		wrapper.ProcessRequestHeadersBy(onHttpRequestHeaders),
+	)
+}
+
+type HelloWorldConfig struct {
+}
+
+func onHttpRequestHeaders(ctx wrapper.HttpContext, config HelloWorldConfig, log wrapper.Log) types.Action {
+	err := proxywasm.AddHttpRequestHeader("hello", "world")
+	Allocmemory()
+	if err != nil {
+		log.Critical("failed to set request header")
+	}
+	proxywasm.SendHttpResponse(200, nil, []byte("hello world"), -1)
+	return types.ActionContinue
+}
+
+func Allocmemory() {
+	rand.Seed(time.Now().UnixNano())
+	start := time.Now()
+	const numRequests = 10000
+
+	for i := 0; i < numRequests; i++ {
+		req := &Request{
+			ID:      i,
+			Payload: generateLargePayload(),
+		}
+
+		resp := processRequest(req)
+
+		// 使用resp避免未使用的错误
+		fmt.Printf("Response for request %d: %d\n", resp.ID, resp.ID)
+
+		// 释放对象
+		req, resp = nil, nil
+	}
+
+	elapsed := time.Since(start)
+	fmt.Printf("Processed %d requests in %s\n", numRequests, elapsed)
+}
 
 type Request struct {
 	ID      int
@@ -35,28 +80,4 @@ func processRequest(req *Request) *Response {
 	largePayload = nil
 
 	return resp
-}
-
-func main() {
-	rand.Seed(time.Now().UnixNano())
-	start := time.Now()
-	const numRequests = 10000
-
-	for i := 0; i < numRequests; i++ {
-		req := &Request{
-			ID:      i,
-			Payload: generateLargePayload(),
-		}
-
-		resp := processRequest(req)
-
-		// 使用resp避免未使用的错误
-		fmt.Printf("Response for request %d: %d\n", resp.ID, resp.ID)
-
-		// 释放对象
-		req, resp = nil, nil
-	}
-
-	elapsed := time.Since(start)
-	fmt.Printf("Processed %d requests in %s\n", numRequests, elapsed)
 }
